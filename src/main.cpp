@@ -2,18 +2,12 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <memory>
+
+#include "common.h"
 
 
-#ifdef _WIN32 // compiling on windows
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-
-#else // NOT compiling on windows
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#endif
+#include "Sprite.h"
 
 std::string exeName;
 SDL_Window *win; //pointer to the SDL_Window
@@ -23,6 +17,9 @@ SDL_Texture *tex; //pointer to the SDL_Texture
 SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
+
+
+std::vector<std::unique_ptr<Sprite>> spriteList;
 
 bool done = false;
 
@@ -79,11 +76,15 @@ void render()
 		//First clear the renderer
 		SDL_RenderClear(ren);
 
-		//Draw the texture
-		SDL_RenderCopy(ren, tex, NULL, NULL);
+		// Draw the texture
+		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Rendering sprites ...");
+		for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
+		{
+			SDL_RenderCopy(ren, tex, NULL, &sprite->rectangle);
+		}
 
 		//Draw the text
-		SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
+		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
 
 		//Update the screen
 		SDL_RenderPresent(ren);
@@ -162,6 +163,12 @@ int main( int argc, char* args[] )
 	message_rect.w = 300;
 	message_rect.h = 100;
 
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites ...");
+	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(0,0, 200, 86)));
+	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(200,200, 200, 86)));
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
+
+
 	while (!done) //loop until done flag is set)
 	{
 		handleInput(); // this should ONLY SET VARIABLES
@@ -172,6 +179,8 @@ int main( int argc, char* args[] )
 
 		SDL_Delay(20); // unless vsync is on??
 	}
+
+	std::cout << "\nSDL Exiting!\n";
 
 	cleanExit(0);
 	return 0;
