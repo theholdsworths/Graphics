@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <cereal/archives/xml.hpp>
+#include <cereal/archives/json.hpp>
 #include <cereal/types/vector.hpp>
 #include <fstream>
 
@@ -168,11 +169,11 @@ int main( int argc, char* args[] )
 	message_rect.h = 100;
 
 
-	std::string spriteListFilePath = "spriteList.xml";
+	std::string spriteListFilePath = "spriteList.json";
 	try
 	{
 		std::ifstream inFile( spriteListFilePath );
-		cereal::XMLInputArchive inArchive(inFile);
+		cereal::JSONInputArchive inArchive(inFile);
 		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Loading spriteList.");
 		inArchive(spriteList);
 		for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
@@ -191,7 +192,7 @@ int main( int argc, char* args[] )
 			spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(200,200, 200, 86)));
 			{
 				std::ofstream outFile( spriteListFilePath );
-				cereal::XMLOutputArchive outArchive( outFile );
+				cereal::JSONOutputArchive outArchive( outFile );
 				SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Writing spriteList.");
 				outArchive( spriteListTmp );
 				for (auto const& sprite : spriteListTmp) //unique_ptr can't be copied, so use reference
@@ -204,7 +205,7 @@ int main( int argc, char* args[] )
 
 		{
 			std::ifstream inFile( spriteListFilePath );
-			cereal::XMLInputArchive inArchive(inFile);
+			cereal::JSONInputArchive inArchive(inFile);
 			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Re-loading spriteList.");
 			inArchive(spriteList);
 			for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
