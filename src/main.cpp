@@ -105,6 +105,18 @@ void cleanExit(int returnValue)
 	exit(returnValue);
 }
 
+enum class CerealFileFormat {JSON, XML, UNKNOWN};
+CerealFileFormat getCerealFileFormat(const std::string& s)
+{
+	size_t i = s.rfind('.', s.length());
+	if (i != std::string::npos) {
+		std::string subString = (s.substr(i+1, s.length() - i));
+ 		if (subString == "json") return CerealFileFormat::JSON;
+		if (subString == "xml")  return  CerealFileFormat::XML;
+	}
+	return(CerealFileFormat::UNKNOWN);
+}
+
 // based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
 int main( int argc, char* args[] )
 {
@@ -169,13 +181,30 @@ int main( int argc, char* args[] )
 	message_rect.h = 100;
 
 
-	std::string spriteListFilePath = "spriteList.json";
+	std::string spriteListFilePath = "spriteList.json"; //CHANGE this for different formats = options {json, xml}
+	CerealFileFormat spriteListFileFormat = getCerealFileFormat(spriteListFilePath);
 	try
 	{
-		std::ifstream inFile( spriteListFilePath );
-		cereal::JSONInputArchive inArchive(inFile);
 		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Loading spriteList.");
-		inArchive(spriteList);
+		std::ifstream inFile( spriteListFilePath );
+		switch (spriteListFileFormat)
+		{
+		case CerealFileFormat::JSON:
+			{
+				cereal::JSONInputArchive inArchive(inFile);
+				inArchive(spriteList);
+			}
+			break;
+		case CerealFileFormat::XML:
+		 	{
+				cereal::XMLInputArchive inArchive(inFile);
+				inArchive(spriteList);
+			}
+			break;
+		case CerealFileFormat::UNKNOWN:
+			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN, "%s is an unknown format. Ignoring", spriteListFilePath.c_str());
+		}
+
 		for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
 		{
 			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, "Sprite loaded: %d, %d, %d, %d, ", sprite->rectangle.x, sprite->rectangle.y, sprite->rectangle.w, sprite->rectangle.h);
@@ -191,10 +220,26 @@ int main( int argc, char* args[] )
 			spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(0,0, 200, 86)));
 			spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(200,200, 200, 86)));
 			{
-				std::ofstream outFile( spriteListFilePath );
-				cereal::JSONOutputArchive outArchive( outFile );
-				SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Writing spriteList.");
-				outArchive( spriteListTmp );
+				std::ofstream outFile( spriteListFilePath );switch (spriteListFileFormat)
+				{
+				case CerealFileFormat::JSON:
+					{
+						SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Writing spriteList as JSON.");
+						cereal::JSONOutputArchive outArchive(outFile);
+						outArchive(spriteListTmp);
+					}
+					break;
+				case CerealFileFormat::XML:
+				 	{
+						SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Writing spriteList as XML.");
+						cereal::XMLOutputArchive outArchive(outFile);
+						outArchive(spriteListTmp);
+					}
+					break;
+				case CerealFileFormat::UNKNOWN:
+					SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN, "%s is an unknown format. Ignoring", spriteListFilePath.c_str());
+				}
+
 				for (auto const& sprite : spriteListTmp) //unique_ptr can't be copied, so use reference
 				{
 					SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, "Sprite written out: %d, %d, %d, %d, ", sprite->rectangle.x, sprite->rectangle.y, sprite->rectangle.w, sprite->rectangle.h);
@@ -204,10 +249,26 @@ int main( int argc, char* args[] )
 		}
 
 		{
-			std::ifstream inFile( spriteListFilePath );
-			cereal::JSONInputArchive inArchive(inFile);
 			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Re-loading spriteList.");
-			inArchive(spriteList);
+			std::ifstream inFile( spriteListFilePath );
+			switch (spriteListFileFormat)
+			{
+			case CerealFileFormat::JSON:
+				{
+					cereal::JSONInputArchive inArchive(inFile);
+					inArchive(spriteList);
+				}
+				break;
+			case CerealFileFormat::XML:
+			 	{
+					cereal::XMLInputArchive inArchive(inFile);
+					inArchive(spriteList);
+				}
+				break;
+			case CerealFileFormat::UNKNOWN:
+				SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN, "%s is an unknown format. Ignoring", spriteListFilePath.c_str());
+			}
+
 			for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
 			{
 				SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, "sprite loaded: %d, %d, %d, %d, ", sprite->rectangle.x, sprite->rectangle.y, sprite->rectangle.w, sprite->rectangle.h);
