@@ -12,4 +12,7 @@
 #include <SDL2/SDL_ttf.h>
 #endif
 
+#include <cereal/cereal.hpp>
+#include <cereal/types/memory.hpp>
+
 #endif /* end of include guard: common_h */

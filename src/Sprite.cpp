@@ -1,5 +1,7 @@
 #include "Sprite.h"
 
+Sprite::Sprite() : Sprite(0, 0, 10, 10) {}
+
 Sprite::Sprite(int x, int y, int w, int h)
 {
     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprite Constructed (%p)", this);

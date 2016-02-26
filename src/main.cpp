@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <string>
 #include <memory>
+#include <cereal/archives/xml.hpp>
+#include <cereal/types/vector.hpp>
+#include <fstream>
 
 #include "common.h"
 
@@ -20,6 +23,7 @@ SDL_Rect message_rect; //SDL_rect for the message
 
 
 std::vector<std::unique_ptr<Sprite>> spriteList;
+
 
 bool done = false;
 
@@ -77,7 +81,7 @@ void render()
 		SDL_RenderClear(ren);
 
 		// Draw the texture
-		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Rendering sprites ...");
+		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, "Rendering sprites ...");
 		for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
 		{
 			SDL_RenderCopy(ren, tex, NULL, &sprite->rectangle);
@@ -163,11 +167,52 @@ int main( int argc, char* args[] )
 	message_rect.w = 300;
 	message_rect.h = 100;
 
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites ...");
-	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(0,0, 200, 86)));
-	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(200,200, 200, 86)));
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 
+	std::string spriteListFilePath = "spriteList.xml";
+	try
+	{
+		std::ifstream inFile( spriteListFilePath );
+		cereal::XMLInputArchive inArchive(inFile);
+		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Loading spriteList.");
+		inArchive(spriteList);
+		for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
+		{
+			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, "Sprite loaded: %d, %d, %d, %d, ", sprite->rectangle.x, sprite->rectangle.y, sprite->rectangle.w, sprite->rectangle.h);
+		}
+	}
+	catch (const cereal::Exception& e)
+	{
+		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN, "\"%s\" doesn't load. Creating ...", spriteListFilePath.c_str());
+
+		{
+			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites to list ...");
+			std::vector<std::unique_ptr<Sprite>> spriteListTmp;
+			spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(0,0, 200, 86)));
+			spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(200,200, 200, 86)));
+			{
+				std::ofstream outFile( spriteListFilePath );
+				cereal::XMLOutputArchive outArchive( outFile );
+				SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Writing spriteList.");
+				outArchive( spriteListTmp );
+				for (auto const& sprite : spriteListTmp) //unique_ptr can't be copied, so use reference
+				{
+					SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, "Sprite written out: %d, %d, %d, %d, ", sprite->rectangle.x, sprite->rectangle.y, sprite->rectangle.w, sprite->rectangle.h);
+				}
+			}
+			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN, "\"%s\" created.", spriteListFilePath.c_str());
+		}
+
+		{
+			std::ifstream inFile( spriteListFilePath );
+			cereal::XMLInputArchive inArchive(inFile);
+			SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Re-loading spriteList.");
+			inArchive(spriteList);
+			for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
+			{
+				SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, "sprite loaded: %d, %d, %d, %d, ", sprite->rectangle.x, sprite->rectangle.y, sprite->rectangle.w, sprite->rectangle.h);
+			}
+		}
+	}
 
 	while (!done) //loop until done flag is set)
 	{

@@ -36,10 +36,12 @@ solution "sdl2template"
 							"./graphics_dependencies/SDL2_image/include",
 							"./graphics_dependencies/SDL2_ttf/include",
 							"./graphics_dependencies/SDL2_mixer/include",
+							"./graphics_dependencies/cereal/include",
 						 }
 		configuration { "linux" }
 		includedirs {
 					 -- should be installed as in ./graphics_dependencies/README.asciidoc
+					 "./graphics_dependencies/cereal/include",
 						 }
 		configuration {}
 
