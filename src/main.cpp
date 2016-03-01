@@ -25,7 +25,6 @@ SDL_Rect message_rect; //SDL_rect for the message
 
 std::vector<std::unique_ptr<Sprite>> spriteList;
 
-
 bool done = false;
 
 void handleInput()
@@ -188,7 +187,7 @@ int main( int argc, char* args[] )
 	std::cout << "SDL initialised OK!\n";
 
 	//create window
-	win = SDL_CreateWindow("SDL Hello World!", 100, 100, 600, 600, SDL_WINDOW_SHOWN);
+	win = SDL_CreateWindow("SDL Hello World!", 100, 100, 800, 600, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
 	//error handling
 	if (win == nullptr)
@@ -204,6 +203,7 @@ int main( int argc, char* args[] )
 		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
 	}
+	SDL_RenderSetLogicalSize(ren, 600, 600);
 
 	std::string imagePath = "./assets/Opengl-logo.svg.png";
 	surface = IMG_Load(imagePath.c_str());
