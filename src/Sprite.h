@@ -2,10 +2,15 @@
 #define Sprite_h
 
 #include "common.h"
+#include <memory>
 
-class Sprite
+class Sprite : public std::enable_shared_from_this<Sprite>
 {
 public:
+    typedef std::unique_ptr<Sprite> UniquePointer;
+    typedef std::shared_ptr<Sprite> SharedPointer;
+    typedef std::weak_ptr<Sprite> WeakPointer;
+
     SDL_Rect rectangle;
 
     Sprite();

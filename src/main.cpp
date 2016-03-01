@@ -22,9 +22,7 @@ SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
 
-
-std::vector<std::unique_ptr<Sprite>> spriteList;
-
+std::vector<Sprite::UniquePointer> spriteList;
 bool done = false;
 
 void handleInput()
@@ -254,9 +252,9 @@ int main( int argc, char* args[] )
 
 		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites to list ...");
 		std::vector<std::unique_ptr<Sprite>> spriteListTmp;
-		spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(0,    0,     100, 43)));
-		spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(200,  200,   200, 86)));
-		spriteListTmp.push_back(std::unique_ptr<Sprite>(new Sprite(-100, 440,   200, 86)));
+		spriteListTmp.push_back(std::make_unique<Sprite>(0,    0,     100, 43));
+		spriteListTmp.push_back(std::make_unique<Sprite>(200,  200,   200, 86));
+		spriteListTmp.push_back(std::make_unique<Sprite>(-100, 440,   200, 86));
 
 		writeSpriteList(scoped_spriteListFilePath, spriteListTmp);
 

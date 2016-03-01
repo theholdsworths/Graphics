@@ -18,7 +18,7 @@ solution "sdl2template"
 			buildoptions ""
 			linkoptions { "/NODEFAULTLIB:msvcrt" } -- https://github.com/yuriks/robotic/blob/master/premake5.lua
 		configuration { "linux" }
-			buildoptions "-std=c++11" --http://industriousone.com/topic/xcode4-c11-build-option
+			buildoptions "-std=c++14" --http://industriousone.com/topic/xcode4-c11-build-option
 			toolset "gcc"
 		configuration {}
 
