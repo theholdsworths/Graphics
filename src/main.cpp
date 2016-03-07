@@ -23,6 +23,15 @@ SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
 
 std::vector<Sprite::UniquePointer> spriteList;
+
+//The music that will be played
+Mix_Music *musicTrack = nullptr;
+
+//The sound effects that will be used
+Mix_Chunk *chunk_FrontLeft = nullptr;
+Mix_Chunk *chunk_FrontRight = nullptr;
+
+
 bool done = false;
 
 void handleInput()
@@ -59,7 +68,9 @@ void handleInput()
 				switch (event.key.keysym.sym)
 				{
 					//hit escape to exit
-					case SDLK_ESCAPE: done = true;
+					case SDLK_ESCAPE: done = true; break;
+					case SDLK_1:  Mix_PlayChannel( -1, chunk_FrontLeft, 0 ); break;
+					case SDLK_2:  Mix_PlayChannel( -1, chunk_FrontRight, 0 ); break;
 				}
 			break;
 		}
@@ -94,6 +105,15 @@ void render()
 
 void cleanExit(int returnValue)
 {
+	//Free the music
+	Mix_FreeMusic( musicTrack );
+	musicTrack = nullptr;
+
+ 	//Free the sound effects
+	Mix_FreeChunk( chunk_FrontLeft );
+	Mix_FreeChunk( chunk_FrontRight );
+
+
 	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture);
 	if (tex != nullptr) SDL_DestroyTexture(tex);
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
@@ -261,6 +281,38 @@ int main( int argc, char* args[] )
 		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Re-loading spriteList.");
 		loadSpriteList(scoped_spriteListFilePath);
 	}
+
+
+	//Initialize SDL_mixer
+	if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+	{
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() <<  std::endl;
+		cleanExit(1);
+	}
+
+	//Load music
+	musicTrack = Mix_LoadMUS( "assets/Skipping in the No Standing Zone.mp3" );
+	if( musicTrack == NULL )
+	{
+		std::cout << "Failed to load beat music! SDL_mixer Error: " << Mix_GetError() << std::endl;
+		cleanExit(1);
+	}
+
+	//Load sound effects
+	chunk_FrontLeft = Mix_LoadWAV( "assets/Front_Left.wav" );
+	if( chunk_FrontLeft == nullptr )
+	{
+		std::cout << "Failed to load scratch sound effect! SDL_mixer Error: " << Mix_GetError()  << std::endl;
+	}
+
+	chunk_FrontRight = Mix_LoadWAV( "assets/Front_Right.wav" );
+	if( chunk_FrontRight == nullptr )
+	{
+		std::cout << "Failed to load scratch sound effect! SDL_mixer Error: " << Mix_GetError()  << std::endl;
+	}
+
+
+	Mix_PlayMusic(musicTrack, -1 );
 
 	while (!done) //loop until done flag is set)
 	{
