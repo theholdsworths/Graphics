@@ -109,7 +109,7 @@ void cleanExit(int returnValue)
 	Mix_FreeMusic( musicTrack );
 	musicTrack = nullptr;
 
- 	//Free the sound effects
+	 //Free the sound effects
 	Mix_FreeChunk( chunk_FrontLeft );
 	Mix_FreeChunk( chunk_FrontRight );
 
@@ -128,7 +128,7 @@ CerealFileFormat getCerealFileFormat(const std::string& s)
 	size_t i = s.rfind('.', s.length());
 	if (i != std::string::npos) {
 		std::string subString = (s.substr(i+1, s.length() - i));
- 		if (subString == "json") return CerealFileFormat::JSON;
+		 if (subString == "json") return CerealFileFormat::JSON;
 		if (subString == "xml")  return  CerealFileFormat::XML;
 	}
 	return(CerealFileFormat::UNKNOWN);
