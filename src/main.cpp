@@ -71,6 +71,18 @@ void handleInput()
 					case SDLK_ESCAPE: done = true; break;
 					case SDLK_1:  Mix_PlayChannel( -1, chunk_FrontLeft, 0 ); break;
 					case SDLK_2:  Mix_PlayChannel( -1, chunk_FrontRight, 0 ); break;
+					case SDLK_p:
+					{
+						if (Mix_PausedMusic())
+						{
+							Mix_ResumeMusic();
+						}
+						else
+						{
+							Mix_PauseMusic();
+						}
+					}
+					break;
 				}
 			break;
 		}
