@@ -8,6 +8,8 @@ solution "sdl2template"
 	sourcePath = "src"
 	binPath = "bin"
 
+
+
 	-- A project defines one build target
 	project (projectName)
 		kind "ConsoleApp"
@@ -19,7 +21,16 @@ solution "sdl2template"
 			linkoptions { "/NODEFAULTLIB:msvcrt" } -- https://github.com/yuriks/robotic/blob/master/premake5.lua
 		configuration { "linux" }
 			buildoptions "-std=c++14" --http://industriousone.com/topic/xcode4-c11-build-option
-			toolset "gcc"
+
+			-- check if clang runs successful (suppressing output)
+			if os.execute("clang -v >/dev/null 2>&1") == 0 then
+				toolset "clang"
+				print("Toolset is:", "clang")
+			else
+				toolset "gcc"
+				print("Toolset is:", "gcc")
+			end
+
 		configuration {}
 
 		files { path.join(sourcePath, "**.h"), path.join(sourcePath, "**.cpp") } -- build all .h and .cpp files recursively
