@@ -13,7 +13,7 @@ Sprite::Sprite(int x, int y, int w, int h)
 
 Sprite::Sprite(const Sprite& sprite) : rectangle(sprite.rectangle)
 {
-    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprite Constructed (%p) - Copied from (%p)", this, sprite);
+    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprite Constructed (%p) - Copied from (%p)", this, &sprite);
 }
 
 Sprite::~Sprite()
