@@ -43,7 +43,7 @@ Dependencies for OpenGL projects in C++
     ** Ubuntu/Debian, package: libsdl2-mixer-dev
 
 - http://zeromq.org/[ZeroMQ]
-  * SDL_mixer 2.0.1
+  * ZeroMQ 4.0.4
     ** http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe[Windows 32 headers and binaries (x86)]
     ** Ubuntu/Debian, package: libzmq3-dev (4.0 series) - http://zeromq.org/distro:debian
       *** 4.1 series - http://zeromq.org/distro:debian

@@ -36,6 +36,8 @@ solution "sdl2template"
 							"./graphics_dependencies/SDL2_image/include",
 							"./graphics_dependencies/SDL2_ttf/include",
 							"./graphics_dependencies/SDL2_mixer/include",
+							"./graphics_dependencies/zmq/include",
+							"./graphics_dependencies/cppzmq",
 						 }
 		configuration { "linux" }
 		includedirs {
@@ -46,7 +48,7 @@ solution "sdl2template"
 
 		-- what libraries need linking to
 		configuration "windows"
-			links { "SDL2", "SDL2main", "opengl32", "glew32", "SDL2_image", "SDL2_ttf", "SDL2_mixer" }
+			links { "SDL2", "SDL2main", "opengl32", "glew32", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "libzmq-v120-mt-gd-4_0_4" }
 		configuration "linux"
 			links { "SDL2", "SDL2main", "GL", "GLEW", "SDL2_image", "SDL2_ttf", "SDL2_mixer" }
 		configuration {}
@@ -59,6 +61,7 @@ solution "sdl2template"
 					"./graphics_dependencies/SDL2_image/lib/x86/",
 					"./graphics_dependencies/SDL2_ttf/lib/x86/",
 					"./graphics_dependencies/SDL2_mixer/lib/x86/",
+					"./graphics_dependencies/zmq/lib/",
 					}
 		configuration "linux"
 					 -- should be installed as in ./graphics_dependencies/README.asciidoc
@@ -116,4 +119,8 @@ solution "sdl2template"
 			-- glew
 			print("  ... glew")
 			os.copyfile("./graphics_dependencies/glew/bin/Release/Win32/glew32.dll", path.join(binPath, "glew32.dll"))
+			
+			-- zmq
+			print("  ... zmq")
+			os.copyfile("./graphics_dependencies/zmq/bin/libzmq-v120-mt-gd-4_0_4.dll", path.join(binPath, "libzmq-v120-mt-gd-4_0_4.dll"))
 		end
