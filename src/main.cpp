@@ -87,8 +87,19 @@ void handleInput()
 						}
 					}
 					break;
+					default:
+						{
+							SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Unhandled key down event type, %d", event.type);
+						}
+						break;
 				}
 			break;
+		default:
+			{
+				SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Unhandled event type, %d", event.type);
+			}
+			break;
+
 		}
 	}
 }
