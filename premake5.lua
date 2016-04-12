@@ -41,7 +41,8 @@ solution "sdl2template"
 						 }
 		configuration { "linux" }
 		includedirs {
-					 -- should be installed as in ./graphics_dependencies/README.asciidoc
+							"./graphics_dependencies/cppzmq", -- no ubuntu package, use local headers
+					 		-- should be installed as in ./graphics_dependencies/README.asciidoc
 						 }
 		configuration {}
 
@@ -50,7 +51,7 @@ solution "sdl2template"
 		configuration "windows"
 			links { "SDL2", "SDL2main", "opengl32", "glew32", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "libzmq-v120-mt-gd-4_0_4" }
 		configuration "linux"
-			links { "SDL2", "SDL2main", "GL", "GLEW", "SDL2_image", "SDL2_ttf", "SDL2_mixer" }
+			links { "SDL2", "SDL2main", "GL", "GLEW", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "zmq" }
 		configuration {}
 
 		-- where are libraries?
@@ -119,7 +120,7 @@ solution "sdl2template"
 			-- glew
 			print("  ... glew")
 			os.copyfile("./graphics_dependencies/glew/bin/Release/Win32/glew32.dll", path.join(binPath, "glew32.dll"))
-			
+
 			-- zmq
 			print("  ... zmq")
 			os.copyfile("./graphics_dependencies/zmq/bin/libzmq-v120-mt-gd-4_0_4.dll", path.join(binPath, "libzmq-v120-mt-gd-4_0_4.dll"))
