@@ -38,44 +38,66 @@ zmq::socket_t this_zmq_subscriber(this_zmq_context, ZMQ_SUB);
 
 void handleNetwork()
 {
-	const int messageLength = 40;
+	// message format
+	// 4 floats, separated by spaces, each with 6 digits, including 0 padding, and 3 digits of precision
+	// this will use 8 bytes per float (6 digits, the decimal, and the space)
+	// making 4 * 8 bytes = 32 bytes
+	const int messageLength = 32;
+
 	if (ZMQserver)
 	{
-		//  Send message to all subscribers
+	// create a message
 		zmq::message_t message(messageLength);
+
+		// add message content according to above format
 		snprintf((char *)message.data(), messageLength,
-			"%06.1f %06.1f %06.1f %06.1f end", float(texture_rect.x), float(texture_rect.y), float(message_rect.x), float(message_rect.y));
+			"%06.3f %06.3f %06.3f %06.3f ", float(texture_rect.x), float(texture_rect.y), float(message_rect.x), float(message_rect.y));
 
 		std::cout << "Message sent: \"" << std::string(static_cast<char*>(message.data()), message.size()) << "\"" << std::endl;
+
+		//  Send message to all subscribers
 		this_zmq_publisher.send(message);
 	}
 	else
 	{
+		// set up NULL filter - i.e. accept all messages
 		const std::string filter = "";
+
+		// set filter on subscriber (we don't really need to do this everyone time)
 		this_zmq_subscriber.setsockopt(ZMQ_SUBSCRIBE, filter.c_str(), filter.length());
 
+		// storage for a new message
 		zmq::message_t update;
 
-		bool gotMessage = this_zmq_subscriber.recv(&update, ZMQ_DONTWAIT);
-		if (gotMessage)
+		// loop while there are messages (could be more than one)
+		while (this_zmq_subscriber.recv(&update, ZMQ_DONTWAIT))
 		{
+			// get the data from the message as a char* (for debug output)
 			char* the_data = static_cast<char*>(update.data());
 
+			// debug output
 			std::cout << "Message received: \"" << std::string(the_data) << "\"" << std::endl;
 
+			// get the data as a streamstring (many other options than this)
 			std::istringstream iss(static_cast<char*>(update.data()));
 
-			iss >> texture_rect.x >> texture_rect.y >> message_rect.x >> message_rect.y;
+			//data format is floats, so have to read back to floats
+			float tx, ty, mx, my;
 
+			// read the string stream into the four floats
+			iss >> tx >> ty >> mx >> my;
+
+			// use those floats to set the SDL_Rects (auto convert to int)
+			texture_rect.x = tx;
+			texture_rect.y = ty;
+			message_rect.x = mx;
+			message_rect.y = my;
+
+			// Debug output
 			std::cout << "texture x, y: " << std::to_string(texture_rect.x) << ", " << std::to_string(texture_rect.y) << std::endl;
 			std::cout << "message x, y: " << std::to_string(message_rect.x) << ", " << std::to_string(message_rect.y) << std::endl;
 		}
-		else
-		{
-			std::cout << "." ;
-		}
 	}
-
 }
 
 void handleInput()
@@ -123,17 +145,20 @@ void handleInput()
 // tag::updateSimulation[]
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
-	handleNetwork();
-
+	// do somesimulation if the server
 	if (ZMQserver)
 	{
+		// bad bad bad simulation - not accounting for real-time
 		texture_rect.x += 1.0f;
-		texture_rect.x = texture_rect.x % (600-texture_rect.w);
+		texture_rect.x = texture_rect.x % (600-texture_rect.w); //bad hardcoding
 
 
 		message_rect.y += 22.0f;
 		message_rect.y = message_rect.y % (600-message_rect.h);
 	}
+
+	handleNetwork(); //send or receive
+
 }
 
 void render()
@@ -153,6 +178,7 @@ void render()
 
 void cleanExit(int returnValue)
 {
+	std::cout << "Exiting." << std::endl;
 	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture);
 	if (tex != nullptr) SDL_DestroyTexture(tex);
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
@@ -188,8 +214,12 @@ int main( int argc, char* args[] )
 	}
 	std::cout << "SDL initialised OK!\n";
 
-	//create window
-	win = SDL_CreateWindow("SDL Hello World!", 100, 100, 600, 600, SDL_WINDOW_SHOWN);
+	//create window (server on left of screen, client to the right)
+	if (ZMQserver)
+		win = SDL_CreateWindow("SDL Hello World!! (SERVER)", 100, 100, 600, 600, SDL_WINDOW_SHOWN);
+	else
+		win = SDL_CreateWindow("SDL Hello World!! (CLIENT)", 700, 100, 600, 600, SDL_WINDOW_SHOWN);
+
 
 	//error handling
 	if (win == nullptr)
