@@ -65,7 +65,7 @@ void handleNetwork()
 
 			std::istringstream iss(static_cast<char*>(update.data()));
 
-			iss >> texture_rect.x >> texture_rect.y >> message_rect.x >> message_rect.y;
+			iss >> texture_rect.x >> texture_rect.y >> message_rect.x >> message_rect.y; //TODO FIXME
 
 			std::cout << "texture x, y: " << std::to_string(texture_rect.x) << ", " << std::to_string(texture_rect.y) << std::endl;
 			std::cout << "message x, y: " << std::to_string(message_rect.x) << ", " << std::to_string(message_rect.y) << std::endl;
@@ -131,6 +131,8 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		texture_rect.x = texture_rect.x % (600-texture_rect.w);
 
 
+		message_rect.x += 5.0f;
+		message_rect.x = message_rect.x % (600-message_rect.w);
 		message_rect.y += 22.0f;
 		message_rect.y = message_rect.y % (600-message_rect.h);
 	}
