@@ -11,7 +11,7 @@ SDL2:shared=True
 SDL2_image:shared=False
 SDL2_mixer:shared=True
 SDL2_ttf:shared=False
-#glew:shared=True
+#glew:shared=False
 
 [generators]
 cmake
