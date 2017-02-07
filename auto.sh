@@ -11,12 +11,11 @@ cd $DIR/build
 ###
 printf "== Installing Packages\n"
 if conan install .. --build missing ; then
-  printf "== Installed Packag  OK\n"
+  printf "== Installed Packages  OK\n"
 else
   printf "== FAILED to Install Packages - Exiting\n"
   exit 1
 fi
-exit 0
 
 ###
 printf "== Creating build system\n"
@@ -30,7 +29,7 @@ printf "== Creating build system\n"
 #        - possible releated issues:
 #          - https://github.com/conan-io/conan/issues/199
 #          - https://github.com/conan-io/conan/issues/178
-if cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCONAN_DISABLE_CHECK_COMPILER=On ; then
+if cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCONAN_DISABLE_CHECK_COMPILER=On ; then
   printf "== Created build system OK\n"
 else
   printf "== FAILED to created build system - Exiting\n"
@@ -42,7 +41,7 @@ fi
 ###
 printf "== Autobuilding (smoke test)\n"
 
-if cmake --build . --config Release; then
+if cmake --build . --config Debug; then
   printf "== Autobuild was OK\n"
 else
   printf "== FAILED to Autobuild\n - Exiting\n"
