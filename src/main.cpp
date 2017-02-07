@@ -66,13 +66,13 @@ int main(int argc, char *argv[]) {
   // Set OpenGL context parameters
   int major = 4, minor = 3;
   SDL_Log("Asking for OpenGL %d.%d context\n", major, minor);
-  
+
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_PROFILE_CORE); //use core profile
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); //ask for forward compatible 
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1); //default, probably 
-  
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); //ask for forward compatible
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1); //default, probably
+
   // OpenGL Context Creation
   SDL_GLContext glcontext = SDL_GL_CreateContext(win);
   if (glcontext == NULL) {
@@ -80,11 +80,22 @@ int main(int argc, char *argv[]) {
                     "SDL_GL_CreateContext init error: %s\n", SDL_GetError());
     return 1;
   }
-  
   SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
   SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
   SDL_Log("Got an OpenGL %d.%d context\n", major, minor);
-  
+
+  // initialise GLEW - sets up the OpenGL function pointers for the version of OpenGL we're using
+  GLenum rev;
+	glewExperimental = GL_TRUE; //GLEW isn't perfect - see https://www.opengl.org/wiki/OpenGL_Loading_Library#GLEW
+  rev = glewInit();
+  if (GLEW_OK != rev){
+    SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+                    "glewInit error: %s\n", glewGetErrorString(rev));
+    return 1;
+  }
+  SDL_Log("glew initialised OK!\n");
+
+
   // Load the music
   Mix_Music *music = Mix_LoadMUS("assets/beat.wav");
   if (!music) {
@@ -113,7 +124,7 @@ int main(int argc, char *argv[]) {
 
   // Render
   // TODO add render code
-  
+
   // Present the back buffer
   SDL_GL_SwapWindow(win);
 
@@ -127,7 +138,7 @@ int main(int argc, char *argv[]) {
   Mix_FreeMusic(music);
   Mix_CloseAudio();
 
-  SDL_GL_DeleteContext(glcontext);  
+  SDL_GL_DeleteContext(glcontext);
   SDL_Quit();
   return 0;
 }
