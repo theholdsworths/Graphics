@@ -152,6 +152,9 @@ int main(int argc, char *argv[]) {
 
   SDL_DestroyTexture(logoTexture);
   SDL_FreeSurface(logoSurface);
+  
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(win);
 
   SDL_Quit();
   return 0;
